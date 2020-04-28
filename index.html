@@ -1,0 +1,279 @@
+<!doctype html>
+<!--suppress HtmlFormInputWithoutLabel -->
+<html lang="en_us">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/monokai.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section data-markdown>
+            <textarea data-template>
+                # Blockchain for Squares
+
+                [Spencer Judge](mailto://spencer@tpfs.io) - [Transparent Systems](https://www.transparentsystems.com/)
+
+                Notes:
+                * Hi! I'm Spencer Judge, an Engineer at Transparent Systems. I work primarily on
+                  our blockchain implementation, and services that surround it.
+                * Today, I'll be talking a little bit about what Transparent Systems does, and how
+                  we leverage Substrate to help do it.
+                * I'll also spend some time on how we strike a balance between the existing financial
+                  system and the world of blockchain and crypto.
+            </textarea>
+        </section>
+
+        <section data-markdown>
+            <textarea data-template>
+                ## What is Transparent Systems?
+
+                * We're developing software for on-demand, fee-free, 24/7 settlement of USD
+                * Why? Cash settlements are still constrained by limited banking hours and costly transaction fees.
+                * Backed by Pantera, Square, Future\Perfect, IDEO, Digital Currency Group, CMT Digital, Vulcan.
+
+                Notes:
+                * We want to provide near-instant settlement of fiat USD.
+                * Can transfer large sums of money, not limited to small amounts like Venmo or Zelle, etc.
+                * Hence usable by businesses for routine settlement.
+                * We think, as I'm sure you're all aware, that the financial system is horribly
+                  outdated and inefficient. We also think that it can be substantially improved
+                  without remaking the world.
+                * The lack of innovation in the financial space (until recently) has been shocking.
+                  What I meant when I talked about "striking a balance" is that we believe the time
+                  is ripe to provide faster, cheaper financial tools that fit into the existing
+                  financial machinery rather than trying to tear it down first.
+                * Blockchain is clearly an interesting candidate to support this type of innovation,
+                  but we think few organizations have tried to provide a seamless integration with
+                  traditional mechanisms, and we think Substrate is a great platform to innovate on
+                  top of.
+            </textarea>
+        </section>
+
+
+        <section data-markdown>
+            <textarea data-template>
+                ## Who wants faster, cheaper settlement?
+
+                Everyone. Particularly, businesses with substantial cashflow.
+
+                Notes:
+                * To clarify - when I say "settlement", imagine a retail institution like a bagel
+                  shop. They have suppliers, like the person who they buy flour from. The bagel
+                  maker receiving the flour isn't directly paying the deliveryman - rather the two
+                  businesses keep a record of outstanding debt that is occasionally "settled". In this
+                  case, by the bagel maker paying the flour maker.
+                * Our goal is to help these businesses replace their existing settlement mechanisms
+                  as simply and as "transparent"ly as possible.
+                * This means we will be interacting a *lot* with businesses that have little-to-no
+                  technical knowhow or ability. In other words, "squares", per the title of the talk.
+                * Often the person in charge of that purchasing decision is going to be a CFO or
+                  accountant, and they're unlikely to be a tech expert.
+            </textarea>
+        </section>
+
+        <section data-markdown>
+            <textarea data-template>
+                ### What do squares* care about?
+                * Stability of value - no (un)stablecoins
+                * Legality - auditable, compliant
+                * Convenience / Ease-of-use
+                * Security
+                * Cost effectiveness
+                * Liquidity
+
+                *square - a person considered to be old-fashioned or boringly conventional in attitude or behavior. <!-- .element: style="font-size: 0.5em; font-style: italic" -->
+
+                Notes:
+                * Stability & legality are simply table-stakes to be used by most businesses.
+                * Stablecoins have a shaky history thus far at best, especially those backed by
+                  a basket of instruments.
+                * Convenience is incredibly important. Users simply will not adopt things that
+                  are hard to use, even if they're "better" functionally or philosophically.
+                * They *really* don't care about your philosophy.
+                * Liquidity refers to how "available" funds are - cash is completely liquid, it
+                  can be used immediately for almost any purpose. Stocks, for example, are still
+                  quite liquid, but less so - you must first find a buyer before you can convert
+                  them into cash. Bitcoin's long confirmation times, for example, make it
+                  less liquid than one might desire.
+            </textarea>
+        </section>
+
+        <section data-markdown>
+            <textarea data-template>
+                ### Things squares do *not* care about
+                #### Even if they probably should
+
+                * What a "private key" is
+                * How a blockchain works
+                * Independence from the currency of their home country
+                * Cryptoeconomics
+
+                Notes:
+                * You can make some really great arguments that they should care about these things!
+                  Unfortunately, they don't, and you probably won't change their mind.
+                * Why would using a blockchain be a selling point to these people? They don't, but
+                  they do indirectly because it can make some of the things on the previous slide
+                  possible in ways they weren't before.
+                * You can only sell your philosophy *after* you have already made their lives
+                  easier. I used to work at Tableau Software, and that's a perfect example. For
+                  the unfamiliar, Tableau sells visual analytics software. Our "philosophy" involved
+                  teaching people that humans understand visuals better than they understand text
+                  tables, but to get them to believe that, you had to make their lives demonstrably
+                  easier first - then later you could convince them to leave the text tables.
+                * I think we've seen a number of efforts in the blockchain and crypto space that
+                  are motivated by how powerful the technology is, or how theoretically ideal the
+                  economics are, and those are really admirable goals - but the unfortunate reality
+                  is that the huge majority of people on earth are perfectly fine with centrally
+                  controlled and monitored financial systems, because those systems allow them to
+                  live their day-to-day lives. People are more interested in improvements that don't
+                  require them to change their habits.
+            </textarea>
+        </section>
+
+
+        <!-- All technical content after this point  -->
+
+        <section data-markdown>
+            <textarea data-template>
+                ### How do we expose an easy interface for our customers?
+
+                ![spongebob apis](spongebob_apis.png) <!-- .element: style="max-width: 30%" -->
+
+                * Our customers are both end-customers, and other teams in the company.
+                * Not all devs have deep blockchain or crypto knowledge
+                * Support varying levels of sophistication in interactions with API
+
+                Notes:
+                * I'm going to talk a little bit about the design of an API we have built on
+                  top of our substrate implementation
+                * Supporting automation against our platform is the goal
+                * We want to empower customers to pick how they manage access to funds
+                * This means they can choose to construct and sign transactions completely by
+                  themselves if they desire, or they can use our software to handle construction
+                  and authentication followed by signing (potentially using an HSM or other keystore)
+
+            </textarea>
+        </section>
+
+
+        <section data-markdown>
+            <textarea data-template>
+                ### Show me
+                ![api diagram](Sub0_TPFS_Api.svg)
+                <!-- .element: style="max-width: 100%; background: gray" -->
+
+                Notes:
+                * Here's an overall view of how other services we author and our customers might
+                  author interact with the network.
+                * The main entry point for most communication is the TPFS api, this is the
+                  service that really handles translating the simple business world to the
+                  complex blockchain world
+                * You'll notice we use gRPC to connect to it. This strikes a nice balance of high
+                  performance (compared to something like REST) while still being widely understood
+                  by many existing potential customers. It also means we can autogenerate clients
+                  for new languages, and we get wire-level compatability for free.
+                * We have built Rust and TypeScript clients that thinly wrap the generated grpc
+                  client to provide more ergonomics
+                * The TPFS API can connect to substrate using JSON RPC either via websockets or
+                  in memory. This is nice if you'd like to run it separately.
+                * The TPFS API also can perform authentication, which in the future will integrate
+                  with standard enterprise authentication systems. It guards access to the keys, which
+                  can be behind an HSM or cloud-managed solution, retrieving them as-needed to sign transactions.
+                  One of the really nice aspects of this approach is that it allows customers to do role-based
+                  authentication of access to their funds. For example, Joe might be able to send any amount under
+                  $1000 while the CFO Bob is allowed to transfer any amount.
+                * You might be wondering what petri is - it's another service we created that
+                  caches historical data that may not be easily accessible from substrate directly.
+                  For example, the transaction history of a particular address, which isn't easy
+                  to implement as an extension to the substrate JSON api.
+
+                  It uses a full or light substrate client to do this. Currently we are embedding
+                  both it and the TPFS-API into full nodes.
+
+                  Right now this petri is just a straightforward cache, but eventually it may also
+                  write to a SQL database for analytics purposes. The overall design allows for
+                  any sort of constantly running transform-and-backup procedure, and supports
+                  backfilling on startup.
+                * This setup allows you to create either a lite or full client capable of performing
+                  TPFS operations
+            </textarea>
+        </section>
+
+        <section>
+            <h2>Performing a transfer</h2>
+Substrate JSON RPC:
+<pre><code>{
+    jsonrpc: "2.0",
+    method: "author_submitAndWatchExtrinsic",
+    params: [
+        "0x590284f8f78fc254f421cca1636c500d2325f3634b8caf6ea44a3d07de07546f6a1c66016c2b1e168e17d6ae9c6abf3aba296a8f46d57315e927bf16e0260402cb2898126dc3f42dd72f3e2c8397475c4fb9fc81d03e6636492503f8dc47c7515224ad8600000a04740765c709fb9bcb7bc116407eb36ee62532ac19a4f05ee90ba9cf1e94472b1188130000000000000000000000000000"
+    ],
+    id: 2,
+}</code></pre>
+
+
+TPFS GRPC API:
+<pre><code>UserTransaction {
+  issuer: "5Hh9Gq21Ns4Knd6CjzjMymK6HeW9yYfxdMfhMoDyA8geHVbJ"
+  operation: Payment {
+    to: "5EgqcJ1sbFkUvySAmxc3bThRePvdmw3zCrXMjqYPaSSSzbkQ"
+    amount: 5000
+  }
+}</code></pre>
+            <aside class="notes">
+                * Let me preface this by saying I think the level of detail the substrate RPC API
+                provides is totally appropriate. This isn't to demonstrate that substrate is bad,
+                but rather that customizing things for your use cases is very good!
+                * Now our customers don't need to understand the SCALE encoding and they don't need
+                  to know the names of things in the substrate runtime
+                * If time, show bloomrpc demo (hide name first)
+            </aside>
+        </section>
+
+
+        <section data-markdown>
+            <textarea data-template>
+                # Q&A
+            </textarea>
+        </section>
+    </div>
+</div>
+
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        hash: true,
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/highlight/highlight.js'},
+            {src: 'plugin/notes/notes.js', async: true}
+        ]
+    });
+</script>
+</body>
+</html>
